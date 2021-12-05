@@ -229,6 +229,11 @@ A class representing a download task created by `RNBackgroundDownloader.download
 | `bytesWritten` | Number | The number of bytes currently written by the task                                                    |
 | `totalBytes`   | Number | The number bytes expected to be written by this task or more plainly, the file size being downloaded |
 
+### `completeHandler(jobId)`
+
+Finishes download job on iOS and informs OS that app can be closed in background if needed.
+After finishing download in background you have some time to process your JS logic and finish the job.
+
 ### `Callback Methods`
 Use these methods to stay updated on what's happening with the task.
 
