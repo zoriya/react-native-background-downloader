@@ -28,7 +28,7 @@ The real challenge of using this method is making sure the app's UI is always up
 
 ## Getting started
 
-`$ yarn add react-native-background-downloader`
+`$ yarn add github:kesha-antonov/react-native-background-downloader`
 
 For **`RN <= 0.57.0`** use `$ yarn add react-native-background-downloader@1.1.0`
 
@@ -86,30 +86,38 @@ Failing to add this code will result in canceled background downloads.
 ### Downloading a file
 
 ```javascript
-import RNBackgroundDownloader from 'react-native-background-downloader';
+import { download, completeHandler } from 'react-native-background-downloader'
 
-let task = RNBackgroundDownloader.download({
-	id: 'file123',
+const jobId = 'file123'
+
+let task = download({
+	id: jobId,
 	url: 'https://link-to-very.large/file.zip'
 	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`
 }).begin(({ expectedBytes, headers }) => {
-	console.log(`Going to download ${expectedBytes} bytes!`);
+	console.log(`Going to download ${expectedBytes} bytes!`)
 }).progress(percent => {
-	console.log(`Downloaded: ${percent * 100}%`);
+	console.log(`Downloaded: ${percent * 100}%`)
 }).done(() => {
-	console.log('Download is done!');
+	console.log('Download is done!')
+
+  // PROCESS YOUR STUFF
+
+  // FINISH DOWNLOAD JOB ON IOS
+  if (Platforms.OS === 'ios')
+    completeHandler(jobId)
 }).error(error => {
 	console.log('Download canceled due to error: ', error);
-});
+})
 
 // Pause the task
-task.pause();
+task.pause()
 
 // Resume after pause
-task.resume();
+task.resume()
 
 // Cancel the task
-task.stop();
+task.stop()
 ```
 
 ### Re-Attaching to background downloads
@@ -121,18 +129,18 @@ What happens to your downloads after the OS stopped your app? Well, they are sti
 Add this code to app's init stage, and you'll never lose a download again!
 
 ```javascript
-import RNBackgroundDownloader from 'react-native-background-downloader';
+import RNBackgroundDownloader from 'react-native-background-downloader'
 
-let lostTasks = await RNBackgroundDownloader.checkForExistingDownloads();
+let lostTasks = await RNBackgroundDownloader.checkForExistingDownloads()
 for (let task of lostTasks) {
-	console.log(`Task ${task.id} was found!`);
+	console.log(`Task ${task.id} was found!`)
 	task.progress(percent => {
-		console.log(`Downloaded: ${percent * 100}%`);
+		console.log(`Downloaded: ${percent * 100}%`)
 	}).done(() => {
-		console.log('Downlaod is done!');
+		console.log('Downlaod is done!')
 	}).error((error) => {
-		console.log('Download canceled due to error: ', error);
-	});
+		console.log('Download canceled due to error: ', error)
+	})
 }
 ```
 
@@ -145,7 +153,7 @@ If you need to send custom headers with your download request, you can do in it 
 ```javascript
 RNBackgroundDownloader.setHeaders({
     Authorization: 'Bearer 2we$@$@Ddd223'
-});
+})
 ```
 This way, all downloads with have the given headers.
 
@@ -159,14 +167,14 @@ let task = RNBackgroundDownloader.download({
 	    Authorization: 'Bearer 2we$@$@Ddd223'
 	}
 }).begin(({ expectedBytes, headers }) => {
-	console.log(`Going to download ${expectedBytes} bytes!`);
+	console.log(`Going to download ${expectedBytes} bytes!`)
 }).progress(percent => {
-	console.log(`Downloaded: ${percent * 100}%`);
+	console.log(`Downloaded: ${percent * 100}%`)
 }).done(() => {
-	console.log('Download is done!');
+	console.log('Download is done!')
 }).error((error) => {
-	console.log('Download canceled due to error: ', error);
-});
+	console.log('Download canceled due to error: ', error)
+})
 ```
 Headers given in the `download` function are **merged** with the ones given in `setHeaders`.
 
