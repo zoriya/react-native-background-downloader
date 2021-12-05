@@ -92,13 +92,13 @@ let task = RNBackgroundDownloader.download({
 	id: 'file123',
 	url: 'https://link-to-very.large/file.zip'
 	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`
-}).begin((expectedBytes) => {
+}).begin(({ expectedBytes, headers }) => {
 	console.log(`Going to download ${expectedBytes} bytes!`);
-}).progress((percent) => {
+}).progress(percent => {
 	console.log(`Downloaded: ${percent * 100}%`);
 }).done(() => {
 	console.log('Download is done!');
-}).error((error) => {
+}).error(error => {
 	console.log('Download canceled due to error: ', error);
 });
 
@@ -126,7 +126,7 @@ import RNBackgroundDownloader from 'react-native-background-downloader';
 let lostTasks = await RNBackgroundDownloader.checkForExistingDownloads();
 for (let task of lostTasks) {
 	console.log(`Task ${task.id} was found!`);
-	task.progress((percent) => {
+	task.progress(percent => {
 		console.log(`Downloaded: ${percent * 100}%`);
 	}).done(() => {
 		console.log('Downlaod is done!');
@@ -158,9 +158,9 @@ let task = RNBackgroundDownloader.download({
 	headers: {
 	    Authorization: 'Bearer 2we$@$@Ddd223'
 	}
-}).begin((expectedBytes) => {
+}).begin(({ expectedBytes, headers }) => {
 	console.log(`Going to download ${expectedBytes} bytes!`);
-}).progress((percent) => {
+}).progress(percent => {
 	console.log(`Downloaded: ${percent * 100}%`);
 }).done(() => {
 	console.log('Download is done!');
@@ -228,7 +228,7 @@ All callback methods return the current instance of the `DownloadTask` for chain
 
 | Function   | Callback Arguments                | Info                                                                                                                          |
 | ---------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `begin`    | expectedBytes                     | Called when the first byte is received. 💡: this is good place to check if the device has enough storage space for this download |
+| `begin`    | { expectedBytes, headers }        | Called when the first byte is received. 💡: this is good place to check if the device has enough storage space for this download |
 | `progress` | percent, bytesWritten, totalBytes | Called at max every 1.5s so you can update your progress bar accordingly                                                      |
 | `done`     |                                   | Called when the download is done, the file is at the destination you've set                                                   |
 | `error`    | error                             | Called when the download stops due to an error                                                                                |

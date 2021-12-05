@@ -15,12 +15,12 @@ RNBackgroundDownloaderEmitter.addListener('downloadProgress', events => {
     }
 });
 
-RNBackgroundDownloaderEmitter.addListener('downloadComplete', event => {
-    let task = tasksMap.get(event.id);
+RNBackgroundDownloaderEmitter.addListener('downloadComplete', ({ id, location }) => {
+    let task = tasksMap.get(id);
     if (task) {
-        task._onDone(event.location);
+        task._onDone({ location });
     }
-    tasksMap.delete(event.id);
+    tasksMap.delete(id);
 });
 
 RNBackgroundDownloaderEmitter.addListener('downloadFailed', event => {
@@ -31,10 +31,10 @@ RNBackgroundDownloaderEmitter.addListener('downloadFailed', event => {
     tasksMap.delete(event.id);
 });
 
-RNBackgroundDownloaderEmitter.addListener('downloadBegin', event => {
-    let task = tasksMap.get(event.id);
+RNBackgroundDownloaderEmitter.addListener('downloadBegin', ({ id, expectedBytes, headers }) => {
+    let task = tasksMap.get(id);
     if (task) {
-        task._onBegin(event.expectedBytes);
+        task._onBegin({ expectedBytes, headers });
     }
 });
 
@@ -49,7 +49,7 @@ export function checkForExistingDownloads() {
     return RNBackgroundDownloader.checkForExistingDownloads()
         .then(foundTasks => {
             return foundTasks.map(taskInfo => {
-                let task = new DownloadTask(taskInfo);
+                let task = new DownloadTask(taskInfo,tasksMap.get(taskInfo.id));
                 if (taskInfo.state === RNBackgroundDownloader.TaskRunning) {
                     task.state = 'DOWNLOADING';
                 } else if (taskInfo.state === RNBackgroundDownloader.TaskSuspended) {
@@ -69,6 +69,10 @@ export function checkForExistingDownloads() {
                 return task;
             }).filter(task => task !== null);
         });
+}
+
+export function completeHandler (jobId) {
+  return RNBackgroundDownloader.completeHandler(jobId)
 }
 
 export function download(options) {
@@ -107,6 +111,7 @@ export const Priority = {
 export default {
     download,
     checkForExistingDownloads,
+    completeHandler,
     setHeaders,
     directories,
     Network,

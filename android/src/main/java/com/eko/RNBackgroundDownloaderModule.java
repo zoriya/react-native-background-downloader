@@ -14,6 +14,8 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.tonyodev.fetch2.Download;
+import com.tonyodev.fetch2core.Downloader;
+import com.tonyodev.fetch2okhttp.OkHttpDownloader;
 import com.tonyodev.fetch2.Error;
 import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
@@ -24,6 +26,8 @@ import com.tonyodev.fetch2.Request;
 import com.tonyodev.fetch2.Status;
 import com.tonyodev.fetch2core.DownloadBlock;
 import com.tonyodev.fetch2core.Func;
+import com.tonyodev.fetch2.HttpUrlConnectionDownloader;
+import com.tonyodev.fetch2core.Downloader;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +43,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+
+import okhttp3.OkHttpClient;
+
+import java.util.Set;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule implements FetchListener {
 
@@ -72,15 +82,21 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
   private DeviceEventManagerModule.RCTDeviceEventEmitter ee;
   private Date lastProgressReport = new Date();
   private HashMap<String, WritableMap> progressReports = new HashMap<>();
-  private static Object sharedLock = new Object(); 
+  private static Object sharedLock = new Object();
 
   public RNBackgroundDownloaderModule(ReactApplicationContext reactContext) {
     super(reactContext);
 
+    OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+    final Downloader okHttpDownloader = new OkHttpDownloader(okHttpClient,
+                Downloader.FileDownloaderType.PARALLEL);
+
     loadConfigMap();
     FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this.getReactApplicationContext())
             .setDownloadConcurrentLimit(4)
-            .setNamespace("RNBackgroundDownloader")
+            .setHttpDownloader(okHttpDownloader)
+            .enableRetryOnNetworkGain(true)
+            .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
             .build();
     fetch = Fetch.Impl.getInstance(fetchConfiguration);
     fetch.addListener(this);
@@ -164,7 +180,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       e.printStackTrace();
     }
   }
-  
+
   private int convertErrorCode(Error error) {
     if ((error == Error.FILE_NOT_CREATED)
     || (error == Error.WRITE_PERMISSION_DENIED)) {
@@ -205,7 +221,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     }
     request.setPriority(options.hasKey("priority") ? Priority.valueOf(options.getInt("priority")) : Priority.NORMAL);
     request.setNetworkType(options.hasKey("network") ? NetworkType.valueOf(options.getInt("network")) : NetworkType.ALL);
-    
+
     fetch.enqueue(request, new Func<Request>() {
         @Override
         public void call(Request download) {
@@ -214,7 +230,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
         @Override
         public void call(Error error) {
           //An error occurred when enqueuing a request.
-          
+
           WritableMap params = Arguments.createMap();
           params.putString("id", id);
           params.putString("error", error.toString());
@@ -232,6 +248,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     );
 
     synchronized(sharedLock) {
+      lastProgressReport = new Date();
       idToRequestId.put(id, request.getId());
       requestIdToConfig.put(request.getId(), config);
       saveConfigMap();
@@ -288,6 +305,8 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
 
               foundIds.pushMap(params);
 
+              // TODO: MAYBE ADD headers
+
               idToRequestId.put(config.id, download.getId());
               config.reportedBegin = true;
             } else {
@@ -309,6 +328,9 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       if (config != null) {
         WritableMap params = Arguments.createMap();
         params.putString("id", config.id);
+
+        // TODO: add location
+
         ee.emit("downloadComplete", params);
       }
 
@@ -331,16 +353,44 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       params.putString("id", config.id);
 
       if (!config.reportedBegin) {
-        params.putInt("expectedBytes", (int)download.getTotal());
-        ee.emit("downloadBegin", params);
         config.reportedBegin = true;
+
+        params.putInt("expectedBytes", (int)download.getTotal());
+
+        // TODO: MAKE IT IN CUSTOM DOWNLOADER
+        // https://github.com/tonyofrancis/Fetch/issues/347#issuecomment-478349299
+        Thread th = new Thread(() -> {
+            try {
+              WritableMap headersMap = Arguments.createMap();
+
+              URL urlC = new URL(download.getUrl());
+              URLConnection con = urlC.openConnection();
+              Map<String,List<String>> headers = con.getHeaderFields();
+              Set<String> keys = headers.keySet();
+              for (String key : keys) {
+                String val = con.getHeaderField(key);
+                headersMap.putString(key, val);
+              }
+              params.putMap("headers", headersMap);
+
+              ee.emit("downloadBegin", params);
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+        });
+        try {
+          th.start();
+          th.join();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       } else {
         params.putInt("written", (int)download.getDownloaded());
         params.putInt("total", (int)download.getTotal());
         params.putDouble("percent", ((double)download.getProgress()) / 100);
         progressReports.put(config.id, params);
         Date now = new Date();
-        if (now.getTime() - lastProgressReport.getTime() > 1500) {
+        if (now.getTime() - lastProgressReport.getTime() > 250) {
           WritableArray reportsArray = Arguments.createArray();
           for (WritableMap report : progressReports.values()) {
             reportsArray.pushMap(report);
