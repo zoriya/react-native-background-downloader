@@ -92,7 +92,7 @@ test('fail event', () => {
             id: 'testFail',
             url: 'test',
             destination: 'test'
-        }).error((error) => {
+        }).error(error => {
             expect(error).toBeInstanceOf(Error);
             expect(failDT.state).toBe('FAILED');
             resolve();

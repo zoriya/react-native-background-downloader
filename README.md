@@ -138,7 +138,7 @@ for (let task of lostTasks) {
 		console.log(`Downloaded: ${percent * 100}%`)
 	}).done(() => {
 		console.log('Downlaod is done!')
-	}).error((error) => {
+	}).error(error => {
 		console.log('Download canceled due to error: ', error)
 	})
 }
@@ -172,7 +172,7 @@ let task = RNBackgroundDownloader.download({
 	console.log(`Downloaded: ${percent * 100}%`)
 }).done(() => {
 	console.log('Download is done!')
-}).error((error) => {
+}).error(error => {
 	console.log('Download canceled due to error: ', error)
 })
 ```
