@@ -29,19 +29,22 @@ test('download function', () => {
 });
 
 test('begin event', () => {
+    const mockedHeaders = { Etag: '123' }
     return new Promise(resolve => {
         const beginDT = RNBackgroundDownloader.download({
             id: 'testBegin',
             url: 'test',
             destination: 'test'
-        }).begin((expectedBytes) => {
+        }).begin(({ expectedBytes, headers }) => {
             expect(expectedBytes).toBe(9001);
+            expect(headers).toBe(mockedHeaders);
             expect(beginDT.state).toBe('DOWNLOADING');
             resolve();
         });
         NativeEventEmitter.listeners.downloadBegin({
             id: 'testBegin',
-            expectedBytes: 9001
+            expectedBytes: 9001,
+            headers: mockedHeaders,
         });
     });
 });
