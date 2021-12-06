@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/react-native-background-downloader.svg)](https://badge.fury.io/js/react-native-background-downloader)
 
 # react-native-background-downloader
-## *Note - This repo is no longer actively maintained * ##
+## *Note - This is fork of https://github.com/EkoLabs/react-native-background-downloader maintained by https://github.com/kesha-antonov * ##
 
 A library for React-Native to help you download large files on iOS and Android both in the foreground and most importantly in the background.
 
