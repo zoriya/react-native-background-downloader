@@ -353,11 +353,13 @@ RCT_EXPORT_METHOD(completeHandler:(nonnull NSString *)jobId
         if (taskCofig != nil) {
             if (!taskCofig.reportedBegin) {
                 NSDictionary *responseHeaders = ((NSHTTPURLResponse *)downloadTask.response).allHeaderFields;
-                [self sendEventWithName:@"downloadBegin" body:@{
-                  @"id": taskCofig.id,
-                  @"expectedBytes": [NSNumber numberWithLongLong: totalBytesExpectedToWrite],
-                  @"headers": responseHeaders
-                }];
+                if (self.bridge) {
+                    [self sendEventWithName:@"downloadBegin" body:@{
+                        @"id": taskCofig.id,
+                        @"expectedBytes": [NSNumber numberWithLongLong: totalBytesExpectedToWrite],
+                        @"headers": responseHeaders
+                    }];
+                }
                 taskCofig.reportedBegin = YES;
             }
 
