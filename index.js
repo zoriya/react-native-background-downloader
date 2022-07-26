@@ -90,7 +90,6 @@ export function download (options) {
 
   options.metadata = JSON.stringify(metadata)
 
-
   RNBackgroundDownloader.download(options)
   const task = new DownloadTask({ id: options.id, metadata: metadata})
   tasksMap.set(options.id, task)
