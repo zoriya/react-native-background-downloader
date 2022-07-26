@@ -222,7 +222,7 @@ RCT_EXPORT_METHOD(download: (NSDictionary *) options) {
             return;
         }
 
-        RNBGDTaskConfig *taskConfig = [[RNBGDTaskConfig alloc] initWithDictionary: @{@"id": identifier, @"destination": destination, @"metadata": metadata}}];
+        RNBGDTaskConfig *taskConfig = [[RNBGDTaskConfig alloc] initWithDictionary: @{@"id": identifier, @"destination": destination, @"metadata": metadata}];
 
         taskToConfigMap[@(task.taskIdentifier)] = taskConfig;
         [[NSUserDefaults standardUserDefaults] setObject:[self serialize: taskToConfigMap] forKey:ID_TO_CONFIG_MAP_KEY];
