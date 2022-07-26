@@ -204,13 +204,14 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     String url = options.getString("url");
     String destination = options.getString("destination");
     ReadableMap headers = options.getMap("headers");
+    String metadata = options.getString("metadata");
 
     if (id == null || url == null || destination == null) {
       Log.e(getName(), "id, url and destination must be set");
       return;
     }
 
-    RNBGDTaskConfig config = new RNBGDTaskConfig(id);
+    RNBGDTaskConfig config = new RNBGDTaskConfig(id, metadata);
     final Request request = new Request(url, destination);
     if (headers != null) {
       ReadableMapKeySetIterator it = headers.keySetIterator();
@@ -298,6 +299,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
               RNBGDTaskConfig config = requestIdToConfig.get(download.getId());
               WritableMap params = Arguments.createMap();
               params.putString("id", config.id);
+              params.putString("metadata", config.metadata);
               params.putInt("state", stateMap.get(download.getStatus()));
               params.putInt("bytesWritten", (int)download.getDownloaded());
               params.putInt("totalBytes", (int)download.getTotal());

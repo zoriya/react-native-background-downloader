@@ -84,6 +84,12 @@ export function download (options) {
   else
     options.headers = headers
 
+  if (options.metadata && typeof options.metadata === 'object')
+    options.metadata = JSON.stringify(options.metadata)
+  else
+    options.metadata = JSON.stringify({})
+
+
   RNBackgroundDownloader.download(options)
   const task = new DownloadTask(options.id)
   tasksMap.set(options.id, task)

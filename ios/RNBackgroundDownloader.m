@@ -200,6 +200,7 @@ RCT_EXPORT_METHOD(download: (NSDictionary *) options) {
     NSString *identifier = options[@"id"];
     NSString *url = options[@"url"];
     NSString *destination = options[@"destination"];
+    NSString *metadata = options[@"metadata"];
     NSDictionary *headers = options[@"headers"];
     if (identifier == nil || url == nil || destination == nil) {
         NSLog(@"[RNBackgroundDownloader] - [Error] id, url and destination must be set");
@@ -221,7 +222,7 @@ RCT_EXPORT_METHOD(download: (NSDictionary *) options) {
             return;
         }
 
-        RNBGDTaskConfig *taskConfig = [[RNBGDTaskConfig alloc] initWithDictionary: @{@"id": identifier, @"destination": destination}];
+        RNBGDTaskConfig *taskConfig = [[RNBGDTaskConfig alloc] initWithDictionary: @{@"id": identifier, @"destination": destination, @"metadata": metadata}}];
 
         taskToConfigMap[@(task.taskIdentifier)] = taskConfig;
         [[NSUserDefaults standardUserDefaults] setObject:[self serialize: taskToConfigMap] forKey:ID_TO_CONFIG_MAP_KEY];
@@ -286,6 +287,7 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
                     NSNumber *percent = foundTask.countOfBytesExpectedToReceive > 0 ? [NSNumber numberWithFloat:(float)task.countOfBytesReceived/(float)foundTask.countOfBytesExpectedToReceive] : @0.0;
                     [idsFound addObject:@{
                                           @"id": taskConfig.id,
+                                          @"metadata": taskConfig.metadata,
                                           @"state": [NSNumber numberWithInt: task.state],
                                           @"bytesWritten": [NSNumber numberWithLongLong:task.countOfBytesReceived],
                                           @"totalBytes": [NSNumber numberWithLongLong:foundTask.countOfBytesExpectedToReceive],
