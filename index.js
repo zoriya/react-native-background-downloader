@@ -78,11 +78,11 @@ export function download (options) {
 
   options.headers = options.headers && typeof options.headers === 'object'
     ? { ...headers, ...options.headers }
-    : headers;
+    : headers
 
   options.metadata = options.metadata && typeof options.metadata === 'object'
     ? JSON.stringify(options.metadata)
-    : JSON.stringify({});
+    : JSON.stringify({})
 
   RNBackgroundDownloader.download(options)
   const task = new DownloadTask({ id: options.id, metadata: options.metadata})
