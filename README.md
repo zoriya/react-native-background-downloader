@@ -92,8 +92,9 @@ const jobId = 'file123'
 
 let task = download({
 	id: jobId,
-	url: 'https://link-to-very.large/file.zip'
-	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`
+	url: 'https://link-to-very.large/file.zip',
+	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
+	metadata: {}
 }).begin(({ expectedBytes, headers }) => {
 	console.log(`Going to download ${expectedBytes} bytes!`)
 }).progress(percent => {
@@ -195,7 +196,8 @@ An object containing options properties
 | `id`          | String                                           | ✅        | All       | A Unique ID to provide for this download. This ID will help to identify the download task when the app re-launches                                                               |
 | `url`         | String                                           | ✅        | All       | URL to file you want to download                                                                                                                                                 |
 | `destination` | String                                           | ✅        | All       | Where to copy the file to once the download is done                                                                                                                              |
-| `headers`      | Object                                           |           | All       | Costume headers to add to the download request. These are merged with the headers given in the `setHeaders` function
+| `metadata`    | Object                                           |           | All       | Data to be preserved on reboot.                                                                                                                              |
+| `headers`      | Object                                           |          | All       | Costume headers to add to the download request. These are merged with the headers given in the `setHeaders` function
 | `priority`    | [Priority (enum)](#priority-enum---android-only) |          | Android   | The priority of the download. On Android, downloading is limited to 4 simultaneous instances where further downloads are queued. Priority helps in deciding which download to pick next from the queue. **Default:** Priority.MEDIUM |
 | `network`     | [Network (enum)](#network-enum---android-only)   |          | Android   | Give your the ability to limit the download to WIFI only. **Default:** Network.ALL                                                                                               |
 
@@ -224,7 +226,8 @@ A class representing a download task created by `RNBackgroundDownloader.download
 ### `Members`
 | Name           | Type   | Info                                                                                                 |
 | -------------- | ------ | ---------------------------------------------------------------------------------------------------- |
-| `id`           | String | The id you gave the task when calling `RNBackgroundDownloader.download`                                |
+| `id`           | String | The id you gave the task when calling `RNBackgroundDownloader.download`                              |
+| `metadata`     | Object | The metadata you gave the task when calling `RNBackgroundDownloader.download`                        |
 | `percent`      | Number | The current percent of completion of the task between 0 and 1                                        |
 | `bytesWritten` | Number | The number of bytes currently written by the task                                                    |
 | `totalBytes`   | Number | The number bytes expected to be written by this task or more plainly, the file size being downloaded |

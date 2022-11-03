@@ -76,16 +76,16 @@ export function download (options) {
   if (!options.id || !options.url || !options.destination)
     throw new Error('[RNBackgroundDownloader] id, url and destination are required')
 
-  if (options.headers && typeof options.headers === 'object')
-    options.headers = {
-      ...headers,
-      ...options.headers,
-    }
-  else
-    options.headers = headers
+  options.headers = options.headers && typeof options.headers === 'object'
+    ? { ...headers, ...options.headers }
+    : headers
+
+  options.metadata = options.metadata && typeof options.metadata === 'object'
+    ? JSON.stringify(options.metadata)
+    : JSON.stringify({})
 
   RNBackgroundDownloader.download(options)
-  const task = new DownloadTask(options.id)
+  const task = new DownloadTask({ id: options.id, metadata: options.metadata})
   tasksMap.set(options.id, task)
   return task
 }
