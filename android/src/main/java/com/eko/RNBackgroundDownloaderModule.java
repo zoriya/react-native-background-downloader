@@ -211,7 +211,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       return;
     }
 
-    RNBGDTaskConfig config = new RNBGDTaskConfig(id, metadata);
+    RNBGDTaskConfig config = new RNBGDTaskConfig(id, destination, metadata);
     final Request request = new Request(url, destination);
     if (headers != null) {
       ReadableMapKeySetIterator it = headers.keySetIterator();
@@ -330,8 +330,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       if (config != null) {
         WritableMap params = Arguments.createMap();
         params.putString("id", config.id);
-
-        // TODO: add location
+        params.putString("location", config.destination);
 
         ee.emit("downloadComplete", params);
       }
