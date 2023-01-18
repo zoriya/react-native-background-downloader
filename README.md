@@ -28,9 +28,25 @@ The real challenge of using this method is making sure the app's UI is always up
 
 ## Getting started
 
-`$ yarn add github:kesha-antonov/react-native-background-downloader`
+```Terminal
+$ yarn add github:kesha-antonov/react-native-background-downloader
+```
+(or for Yarn v2+):
+```Terminal
+$ yarn add react-native-background-downloader@github:kesha-antonov/react-native-background-downloader
+```
+or
+```Terminal
+npm i github:kesha-antonov/react-native-background-downloader
+```
+
 
 For **`RN <= 0.57.0`** use `$ yarn add react-native-background-downloader@1.1.0`
+
+Then `pod install`:
+```Terminal
+cd ios && pod install
+```
 
 ### Mostly automatic installation
 Any React Native version **`>= 0.60`** supports autolinking so nothing should be done.
@@ -79,13 +95,14 @@ In your `AppDelegate.m` add the following code:
 
 ...
 ```
-Failing to add this code will result in canceled background downloads.
+Failing to add this code will result in canceled background downloads. If Xcode complains that RNBackgroundDownloader.h is missing, you might have forgotten to `pod install` first.
 
 ## Usage
 
 ### Downloading a file
 
 ```javascript
+import { Platform } from 'react-native'
 import { download, completeHandler } from 'react-native-background-downloader'
 
 const jobId = 'file123'
@@ -105,7 +122,7 @@ let task = download({
   // PROCESS YOUR STUFF
 
   // FINISH DOWNLOAD JOB ON IOS
-  if (Platforms.OS === 'ios')
+  if (Platform.OS === 'ios')
     completeHandler(jobId)
 }).error(error => {
 	console.log('Download canceled due to error: ', error);
@@ -138,14 +155,14 @@ for (let task of lostTasks) {
 	task.progress(percent => {
 		console.log(`Downloaded: ${percent * 100}%`)
 	}).done(() => {
-		console.log('Downlaod is done!')
+		console.log('Download is done!')
 	}).error(error => {
 		console.log('Download canceled due to error: ', error)
 	})
 }
 ```
 
-`task.id` is very important for re-attaching the download task with any UI component representing that task, this is why you need to make sure to give sensible IDs that you know what to do with, try to avoid using random IDs.
+`task.id` is very important for re-attaching the download task with any UI component representing that task. This is why you need to make sure to give sensible IDs that you know what to do with, try to avoid using random IDs.
 
 ### Using custom headers
 If you need to send custom headers with your download request, you can do in it 2 ways:
