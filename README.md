@@ -28,7 +28,18 @@ The real challenge of using this method is making sure the app's UI is always up
 
 ## Getting started
 
-`$ yarn add github:kesha-antonov/react-native-background-downloader`
+```Terminal
+$ yarn add github:kesha-antonov/react-native-background-downloader
+```
+(or for Yarn v2+):
+```Terminal
+$ yarn add react-native-background-downloader@github:kesha-antonov/react-native-background-downloader
+```
+or
+```Terminal
+npm i github:kesha-antonov/react-native-background-downloader
+```
+
 
 For **`RN <= 0.57.0`** use `$ yarn add react-native-background-downloader@1.1.0`
 
