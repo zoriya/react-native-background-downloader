@@ -9,6 +9,8 @@ import { NativeModules } from 'react-native';
 // 3 - Completed (not necessarily successfully)
 
 NativeModules.RNBackgroundDownloader = {
+    addListener: jest.fn(),
+    removeListeners: jest.fn(),
     download: jest.fn(),
     pauseTask: jest.fn(),
     resumeTask: jest.fn(),
