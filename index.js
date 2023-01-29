@@ -9,31 +9,27 @@ let headers = {}
 RNBackgroundDownloaderEmitter.addListener('downloadProgress', events => {
   for (const event of events) {
     const task = tasksMap.get(event.id)
-    if (task)
-      task._onProgress(event.percent, event.written, event.total)
+    task?.onProgress(event.percent, event.written, event.total)
   }
 })
 
 RNBackgroundDownloaderEmitter.addListener('downloadComplete', ({ id, location }) => {
   const task = tasksMap.get(id)
-  if (task)
-    task._onDone({ location })
+  task?.onDone({ location })
 
   tasksMap.delete(id)
 })
 
 RNBackgroundDownloaderEmitter.addListener('downloadFailed', event => {
   const task = tasksMap.get(event.id)
-  if (task)
-    task._onError(event.error, event.errorcode)
+  task?.onError(event.error, event.errorcode)
 
   tasksMap.delete(event.id)
 })
 
 RNBackgroundDownloaderEmitter.addListener('downloadBegin', ({ id, expectedBytes, headers }) => {
   const task = tasksMap.get(id)
-  if (task)
-    task._onBegin({ expectedBytes, headers })
+  task?.onBegin({ expectedBytes, headers })
 })
 
 export function setHeaders (h = {}) {
