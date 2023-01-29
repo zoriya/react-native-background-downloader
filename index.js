@@ -32,14 +32,14 @@ RNBackgroundDownloaderEmitter.addListener('downloadBegin', ({ id, expectedBytes,
   task?.onBegin({ expectedBytes, headers })
 })
 
-export function setHeaders(h = {}) {
+export function setHeaders (h = {}) {
   if (typeof h !== 'object')
     throw new Error('[RNBackgroundDownloader] headers must be an object')
 
   headers = h
 }
 
-export function checkForExistingDownloads() {
+export function checkForExistingDownloads () {
   return RNBackgroundDownloader.checkForExistingDownloads()
     .then(foundTasks => {
       return foundTasks.map(taskInfo => {
@@ -64,7 +64,7 @@ export function checkForExistingDownloads() {
     })
 }
 
-export function ensureDownloadsAreRunning() {
+export function ensureDownloadsAreRunning () {
   return checkForExistingDownloads()
     .then(tasks => {
       for (const task of tasks)
@@ -75,11 +75,11 @@ export function ensureDownloadsAreRunning() {
     })
 }
 
-export function completeHandler(jobId) {
+export function completeHandler (jobId) {
   return RNBackgroundDownloader.completeHandler(jobId)
 }
 
-export function download(options) {
+export function download (options) {
   if (!options.id || !options.url || !options.destination)
     throw new Error('[RNBackgroundDownloader] id, url and destination are required')
 
