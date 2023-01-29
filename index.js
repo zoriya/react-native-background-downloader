@@ -32,14 +32,14 @@ RNBackgroundDownloaderEmitter.addListener('downloadBegin', ({ id, expectedBytes,
   task?.onBegin({ expectedBytes, headers })
 })
 
-export function setHeaders (h = {}) {
+export function setHeaders(h = {}) {
   if (typeof h !== 'object')
     throw new Error('[RNBackgroundDownloader] headers must be an object')
 
   headers = h
 }
 
-export function checkForExistingDownloads () {
+export function checkForExistingDownloads() {
   return RNBackgroundDownloader.checkForExistingDownloads()
     .then(foundTasks => {
       return foundTasks.map(taskInfo => {
@@ -55,7 +55,7 @@ export function checkForExistingDownloads () {
           if (taskInfo.bytesWritten === taskInfo.totalBytes)
             task.state = 'DONE'
           else
-          // IOS completed the download but it was not done.
+            // IOS completed the download but it was not done.
             return null
         }
         tasksMap.set(taskInfo.id, task)
@@ -64,25 +64,38 @@ export function checkForExistingDownloads () {
     })
 }
 
-export function completeHandler (jobId) {
+export function ensureDownloadsAreRunning() {
+  return checkForExistingDownloads()
+    .then(tasks => {
+      for (const task of tasks)
+        if (task.state === 'DOWNLOADING') {
+          task.pause()
+          task.resume()
+        }
+    })
+}
+
+export function completeHandler(jobId) {
   return RNBackgroundDownloader.completeHandler(jobId)
 }
 
-export function download (options) {
+export function download(options) {
   if (!options.id || !options.url || !options.destination)
     throw new Error('[RNBackgroundDownloader] id, url and destination are required')
 
-  options.headers = options.headers && typeof options.headers === 'object'
-    ? { ...headers, ...options.headers }
-    : headers
+  options.headers = { ...headers, ...(options.headers || {}) }
 
-  options.metadata = options.metadata && typeof options.metadata === 'object'
-    ? JSON.stringify(options.metadata)
-    : JSON.stringify({})
+  options.metadata = JSON.stringify(
+    options.metadata && typeof options.metadata === 'object'
+      ? options.metadata
+      : {}
+  )
 
-  RNBackgroundDownloader.download(options)
   const task = new DownloadTask({ id: options.id, metadata: options.metadata })
   tasksMap.set(options.id, task)
+
+  RNBackgroundDownloader.download(options)
+
   return task
 }
 
@@ -104,6 +117,7 @@ export const Priority = {
 export default {
   download,
   checkForExistingDownloads,
+  ensureDownloadsAreRunning,
   completeHandler,
   setHeaders,
   directories,

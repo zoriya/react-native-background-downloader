@@ -254,6 +254,51 @@ A class representing a download task created by `RNBackgroundDownloader.download
 Finishes download job on iOS and informs OS that app can be closed in background if needed.
 After finishing download in background you have some time to process your JS logic and finish the job.
 
+### `ensureDownloadsAreRunning`
+
+Pauses and resumes all downloads - this is fix for stuck downloads. Use it when your app loaded and is ready for handling downloads (all your logic loaded and ready to handle download callbacks).
+
+Here's example of how you can use it:
+
+1. When your app just loaded
+
+Either stop all tasks:
+
+```javascript
+const tasks = await checkForExistingDownloads()
+for (const task of tasks)
+	task.stop()
+```
+
+Or re-attach them:
+
+```javascript
+const tasks = await checkForExistingDownloads()
+for (const task of tasks) {
+	task.pause()
+	//
+	// YOUR LOGIC OF RE-ATTACHING DOWLOADS TO YOUR STUFF
+	// ...
+	//
+}
+```
+
+2. Prepare your app to handle downloads... (load your state etc.)
+
+3. Add listener to handle when your app goes foreground (be sure to do it only after you stopped all tasks or re-attached them!)
+
+```javascript
+
+function handleAppStateChange (appState) {
+	if (appState !== 'active')
+		return
+
+	ensureDownloadsAreRunning()
+}
+
+const appStateChangeListener = AppState.addEventListener('change', handleAppStateChange)
+```
+
 ### `Callback Methods`
 Use these methods to stay updated on what's happening with the task.
 
