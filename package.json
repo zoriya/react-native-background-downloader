@@ -36,8 +36,10 @@
     "android/src/"
   ],
   "scripts": {
+    "bump": "npm version patch",
     "lint": "eslint .",
     "prepublishOnly": "jest && npm run lint",
+    "publish": "npm publish",
     "test": "jest"
   },
   "lint-staged": {
