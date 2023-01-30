@@ -29,7 +29,7 @@ The real challenge of using this method is making sure the app's UI is always up
 ## Getting started
 
 ```Terminal
-$ yarn add @kesha-antonov/react-native-background-downloader
+yarn add @kesha-antonov/react-native-background-downloader
 ```
 
 or
