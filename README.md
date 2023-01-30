@@ -29,21 +29,16 @@ The real challenge of using this method is making sure the app's UI is always up
 ## Getting started
 
 ```Terminal
-$ yarn add github:kesha-antonov/react-native-background-downloader
+$ yarn add @kesha-antonov/react-native-background-downloader
 ```
-(or for Yarn v2+):
-```Terminal
-$ yarn add react-native-background-downloader@github:kesha-antonov/react-native-background-downloader
-```
+
 or
 ```Terminal
-npm i github:kesha-antonov/react-native-background-downloader
+npm i @kesha-antonov/react-native-background-downloader
 ```
 
+Then:
 
-For **`RN <= 0.57.0`** use `$ yarn add react-native-background-downloader@1.1.0`
-
-Then `pod install`:
 ```Terminal
 cd ios && pod install
 ```
@@ -57,6 +52,7 @@ For anything **`< 0.60`** run the following link command
 
 ### Manual installation
 
+<details>
 
 #### iOS
 
@@ -79,6 +75,7 @@ For anything **`< 0.60`** run the following link command
   	```
       compile project(':react-native-background-downloader')
   	```
+</details>
 
 ### iOS - Extra Mandatory Step
 In your `AppDelegate.m` add the following code:
@@ -342,8 +339,11 @@ An absolute path to the app's documents directory. It is recommended that you us
 
 `Network.ALL` - Default ✅
 
-## Author
+## Authors
+
 Developed by [Elad Gil](https://github.com/ptelad) of [Eko](http://www.helloeko.com)
+
+Maintained by [Kesha Antonov](https://github.com/kesha-antonov)
 
 ## License
 Apache 2
