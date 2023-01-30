@@ -1,7 +1,7 @@
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name         = package['name']
+  s.name         = package['name'].split('/')[1..-1].join('/')
   s.version      = package['version']
   s.summary      = 'React Native background downloader'
   s.description  = package['description']
