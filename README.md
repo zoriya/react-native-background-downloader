@@ -296,7 +296,7 @@ function handleAppStateChange (appState) {
 const appStateChangeListener = AppState.addEventListener('change', handleAppStateChange)
 ```
 
-4. Call ensureDownloadsAreRunning() after all was setup.
+4. Call `ensureDownloadsAreRunning()` after all was setup.
 
 ### `Callback Methods`
 Use these methods to stay updated on what's happening with the task.
