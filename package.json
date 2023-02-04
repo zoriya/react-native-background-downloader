@@ -25,11 +25,13 @@
     }
   ],
   "main": "index.js",
+  "types": "index.d.ts",
   "files": [
     "README.md",
     "LICENSE",
     "react-native-background-downloader.podspec",
     "package.json",
+    "index.d.ts",
     "index.js",
     "lib/",
     "ios/",
