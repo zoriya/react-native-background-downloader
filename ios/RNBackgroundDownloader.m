@@ -385,9 +385,8 @@ RCT_EXPORT_METHOD(completeHandler:(nonnull NSString *)jobId
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     NSLog(@"[RNBackgroundDownloader] - [didCompleteWithError]");
     @synchronized (sharedLock) {
-        if (error != nil) {
+        if (error == nil)
             return;
-        }
 
         RNBGDTaskConfig *taskCofig = taskToConfigMap[@(task.taskIdentifier)];
         if (taskCofig == nil)
