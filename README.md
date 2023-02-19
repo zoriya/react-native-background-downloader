@@ -221,7 +221,9 @@ An object containing options properties
 
 ### `checkForExistingDownloads()`
 
-Checks for downloads that ran in background while you app was terminated. Recommended to run at the init stage of the app.
+Checks for downloads that ran in background while you app was terminated. And also forces them to resume downloads.
+
+Recommended to run at the init stage of the app.
 
 **returns**
 
