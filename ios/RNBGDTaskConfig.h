@@ -45,7 +45,13 @@
     if (self) {
         self.id = [aDecoder decodeObjectForKey:@"id"];
         self.destination = [aDecoder decodeObjectForKey:@"destination"];
-        self.metadata = [aDecoder decodeObjectForKey:@"metadata"];
+
+        // metadata CAN BE nil AFTER UPGRADE FROM VERSION WHERE WAS NO PROP "metadata"
+        NSString * metadata = [aDecoder decodeObjectForKey:@"metadata"];
+        if (metadata == nil)
+            metadata = @"{}";
+        self.metadata = metadata;
+
         self.reportedBegin = [aDecoder decodeBoolForKey:@"reportedBegin"];
     }
 

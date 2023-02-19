@@ -112,7 +112,7 @@ RCT_EXPORT_MODULE();
 // NOTE: FIXES HANGING DOWNLOADS WHEN GOING TO BG
 - (void) resumeTasks:(NSNotification *) note {
     NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 1");
-    @synchronized (self->sharedLock) {
+    @synchronized (sharedLock) {
         [urlSession getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
             NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 2");
             for (NSURLSessionDownloadTask *task in downloadTasks) {
@@ -280,19 +280,20 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
                         if (task.error && task.error.code == -999 && task.error.userInfo[NSURLSessionDownloadTaskResumeData] != nil) {
                             task = [urlSession downloadTaskWithResumeData:task.error.userInfo[NSURLSessionDownloadTaskResumeData]];
                         } else {
-                            task = [urlSession downloadTaskWithURL:foundTask.currentRequest.URL];
+                            task = [urlSession downloadTaskWithURL:task.currentRequest.URL];
                         }
                         [task resume];
                     }
-                    NSNumber *percent = foundTask.countOfBytesExpectedToReceive > 0 ? [NSNumber numberWithFloat:(float)task.countOfBytesReceived/(float)foundTask.countOfBytesExpectedToReceive] : @0.0;
+                    NSNumber *percent = task.countOfBytesExpectedToReceive > 0 ? [NSNumber numberWithFloat:(float)task.countOfBytesReceived/(float)task.countOfBytesExpectedToReceive] : @0.0;
+
                     [idsFound addObject:@{
-                                          @"id": taskConfig.id,
-                                          @"metadata": taskConfig.metadata,
-                                          @"state": [NSNumber numberWithInt: task.state],
-                                          @"bytesWritten": [NSNumber numberWithLongLong:task.countOfBytesReceived],
-                                          @"totalBytes": [NSNumber numberWithLongLong:foundTask.countOfBytesExpectedToReceive],
-                                          @"percent": percent
-                                          }];
+                                            @"id": taskConfig.id,
+                                            @"metadata": taskConfig.metadata,
+                                            @"state": [NSNumber numberWithInt: task.state],
+                                            @"bytesWritten": [NSNumber numberWithLongLong:task.countOfBytesReceived],
+                                            @"totalBytes": [NSNumber numberWithLongLong:task.countOfBytesExpectedToReceive],
+                                            @"percent": percent
+                                            }];
                     taskConfig.reportedBegin = YES;
                     taskToConfigMap[@(task.taskIdentifier)] = taskConfig;
                     idToTaskMap[taskConfig.id] = task;
