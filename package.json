@@ -24,7 +24,7 @@
       "name": "Elad Gil"
     }
   ],
-  "main": "index.js",
+  "main": "index.ts",
   "types": "index.d.ts",
   "files": [
     "README.md",

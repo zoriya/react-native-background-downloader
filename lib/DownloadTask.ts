@@ -100,8 +100,9 @@ export default class DownloadTask {
 
   tryParseJson (element) {
     try {
-      if (element)
+      if (typeof element === 'string')
         element = JSON.parse(element)
+
       return element
     } catch (e) {
       console.warn('DownloadTask tryParseJson', e)
