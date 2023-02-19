@@ -287,13 +287,13 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
                     NSNumber *percent = task.countOfBytesExpectedToReceive > 0 ? [NSNumber numberWithFloat:(float)task.countOfBytesReceived/(float)task.countOfBytesExpectedToReceive] : @0.0;
 
                     [idsFound addObject:@{
-                                            @"id": taskConfig.id,
-                                            @"metadata": taskConfig.metadata,
-                                            @"state": [NSNumber numberWithInt: task.state],
-                                            @"bytesWritten": [NSNumber numberWithLongLong:task.countOfBytesReceived],
-                                            @"totalBytes": [NSNumber numberWithLongLong:task.countOfBytesExpectedToReceive],
-                                            @"percent": percent
-                                            }];
+                        @"id": taskConfig.id,
+                        @"metadata": taskConfig.metadata,
+                        @"state": [NSNumber numberWithInt: task.state],
+                        @"bytesWritten": [NSNumber numberWithLongLong:task.countOfBytesReceived],
+                        @"totalBytes": [NSNumber numberWithLongLong:task.countOfBytesExpectedToReceive],
+                        @"percent": percent
+                    }];
                     taskConfig.reportedBegin = YES;
                     taskToConfigMap[@(task.taskIdentifier)] = taskConfig;
                     idToTaskMap[taskConfig.id] = task;
