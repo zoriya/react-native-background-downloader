@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class RNBGDTaskConfig implements Serializable {
     public String id;
     public String destination;
-    public String metadata;
+    public String metadata = "{}";
     public boolean reportedBegin;
 
     public RNBGDTaskConfig(String id, String destination, String metadata) {
