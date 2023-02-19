@@ -1,5 +1,6 @@
 import { NativeModules, NativeEventEmitter } from 'react-native'
-import DownloadTask from './lib/downloadTask'
+import DownloadTask from './lib/DownloadTask'
+
 const { RNBackgroundDownloader } = NativeModules
 const RNBackgroundDownloaderEmitter = new NativeEventEmitter(RNBackgroundDownloader)
 
@@ -43,7 +44,9 @@ export function checkForExistingDownloads () {
   return RNBackgroundDownloader.checkForExistingDownloads()
     .then(foundTasks => {
       return foundTasks.map(taskInfo => {
+        // SECOND ARGUMENT RE-ASSIGNS EVENT HANDLERS
         const task = new DownloadTask(taskInfo, tasksMap.get(taskInfo.id))
+
         if (taskInfo.state === RNBackgroundDownloader.TaskRunning) {
           task.state = 'DOWNLOADING'
         } else if (taskInfo.state === RNBackgroundDownloader.TaskSuspended) {
@@ -79,22 +82,33 @@ export function completeHandler (jobId) {
   return RNBackgroundDownloader.completeHandler(jobId)
 }
 
-export function download (options) {
+type DownloadOptions = {
+  id: string,
+  url: string,
+  destination: string,
+  headers?: object,
+  metadata?: object,
+}
+
+export function download (options : DownloadOptions) {
   if (!options.id || !options.url || !options.destination)
     throw new Error('[RNBackgroundDownloader] id, url and destination are required')
 
   options.headers = { ...headers, ...(options.headers || {}) }
 
-  options.metadata = JSON.stringify(
-    options.metadata && typeof options.metadata === 'object'
-      ? options.metadata
-      : {}
-  )
+  if (!(options.metadata && typeof options.metadata === 'object'))
+    options.metadata = {}
 
-  const task = new DownloadTask({ id: options.id, metadata: options.metadata })
+  const task = new DownloadTask({
+    id: options.id,
+    metadata: options.metadata,
+  })
   tasksMap.set(options.id, task)
 
-  RNBackgroundDownloader.download(options)
+  RNBackgroundDownloader.download({
+    ...options,
+    metadata: JSON.stringify(options.metadata),
+  })
 
   return task
 }

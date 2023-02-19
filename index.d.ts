@@ -13,11 +13,18 @@ type SetHeaders = (h: DownloadHeaders) => void;
 
 export interface TaskInfoObject {
   id: string;
-  percent: number;
-  bytesWritten: number;
-  totalBytes: number;
+  metadata: object | string;
+
+  percent?: number;
+  bytesWritten?: number;
+  totalBytes?: number;
+
+  beginHandler?: Function;
+  progressHandler?: Function;
+  doneHandler?: Function;
+  errorHandler?: Function;
 }
-export type TaskInfo = string | TaskInfoObject;
+export type TaskInfo = TaskInfoObject;
 
 export interface BeginHandlerObject {
   expectedBytes: number;

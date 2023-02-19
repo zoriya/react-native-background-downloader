@@ -1,4 +1,6 @@
 import { NativeModules } from 'react-native'
+import { TaskInfo } from '..'
+
 const { RNBackgroundDownloader } = NativeModules
 
 function validateHandler (handler) {
@@ -9,13 +11,15 @@ function validateHandler (handler) {
 }
 
 export default class DownloadTask {
+  id = ''
   state = 'PENDING'
+  metadata = {}
+
   percent = 0
   bytesWritten = 0
   totalBytes = 0
-  metadata = {}
 
-  constructor (taskInfo, originalTask) {
+  constructor (taskInfo: TaskInfo, originalTask?: TaskInfo) {
     this.id = taskInfo.id
     this.percent = taskInfo.percent ?? 0
     this.bytesWritten = taskInfo.bytesWritten ?? 0
