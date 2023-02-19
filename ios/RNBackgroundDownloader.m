@@ -111,18 +111,14 @@ RCT_EXPORT_MODULE();
 
 // NOTE: FIXES HANGING DOWNLOADS WHEN GOING TO BG
 - (void) resumeTasks:(NSNotification *) note {
-    NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 1");
+    NSLog(@"[RNBackgroundDownloader] - [resumeTasks]");
     @synchronized (sharedLock) {
         [urlSession getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
-            NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 2");
             for (NSURLSessionDownloadTask *task in downloadTasks) {
-                NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 3 - state - %@", [NSNumber numberWithInt:task.state]);
                 // running - 0
                 // suspended - 1
                 // canceling - 2
                 // completed - 3
-                NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 4 - totalBytes - %@", [NSNumber numberWithInt:task.countOfBytesExpectedToReceive]);
-                NSLog(@"[RNBackgroundDownloader] - [resumeTasks] 5 - bytesWritten - %@", [NSNumber numberWithInt:task.countOfBytesReceived]);
 
                 if (task.state == NSURLSessionTaskStateRunning) {
                     [task suspend]; // PAUSE
@@ -276,8 +272,8 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
                 NSURLSessionDownloadTask __strong *task = foundTask;
                 RNBGDTaskConfig *taskConfig = taskToConfigMap[@(task.taskIdentifier)];
                 if (taskConfig) {
-                    if (task.state == NSURLSessionTaskStateCompleted && task.countOfBytesReceived < task.countOfBytesExpectedToReceive) {
-                        if (task.error && task.error.code == -999 && task.error.userInfo[NSURLSessionDownloadTaskResumeData] != nil) {
+                    if ((task.state == NSURLSessionTaskStateCompleted || task.state == NSURLSessionTaskStateSuspended) && task.countOfBytesReceived < task.countOfBytesExpectedToReceive) {
+                        if (task.error && task.error.userInfo[NSURLSessionDownloadTaskResumeData] != nil) {
                             task = [urlSession downloadTaskWithResumeData:task.error.userInfo[NSURLSessionDownloadTaskResumeData]];
                         } else {
                             task = [urlSession downloadTaskWithURL:task.currentRequest.URL];
@@ -354,6 +350,7 @@ RCT_EXPORT_METHOD(completeHandler:(nonnull NSString *)jobId
     @synchronized (sharedLock) {
         RNBGDTaskConfig *taskCofig = taskToConfigMap[@(downloadTask.taskIdentifier)];
         if (taskCofig != nil) {
+            // NSLog(@"[RNBackgroundDownloader] - [didWriteData] destination - %@", taskCofig.destination);
             if (!taskCofig.reportedBegin) {
                 NSDictionary *responseHeaders = ((NSHTTPURLResponse *)downloadTask.response).allHeaderFields;
                 if (self.bridge) {
@@ -388,11 +385,19 @@ RCT_EXPORT_METHOD(completeHandler:(nonnull NSString *)jobId
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     NSLog(@"[RNBackgroundDownloader] - [didCompleteWithError]");
     @synchronized (sharedLock) {
+        if (error != nil) {
+            return;
+        }
+
         RNBGDTaskConfig *taskCofig = taskToConfigMap[@(task.taskIdentifier)];
-        if (error != nil && error.code != -999 && taskCofig != nil) {
-            if (self.bridge) {
-                [self sendEventWithName:@"downloadFailed" body:@{@"id": taskCofig.id, @"error": [error localizedDescription]}];
-            }
+        if (taskCofig == nil)
+            return;
+
+        if (self.bridge) {
+            [self sendEventWithName:@"downloadFailed" body:@{@"id": taskCofig.id, @"error": [error localizedDescription]}];
+        }
+        // IF WE CAN'T RESUME TO DOWNLOAD LATER
+        if (error.userInfo[NSURLSessionDownloadTaskResumeData] == nil) {
             [self removeTaskFromMap:task];
         }
     }
