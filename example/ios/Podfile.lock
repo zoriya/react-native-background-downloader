@@ -286,6 +286,8 @@ PODS:
     - glog
   - react-native-background-downloader (2.7.2):
     - React-Core
+  - react-native-slider (4.4.2):
+    - React-Core
   - React-perflogger (0.69.8)
   - React-RCTActionSheet (0.69.8):
     - React-Core/RCTActionSheetHeaders (= 0.69.8)
@@ -352,6 +354,10 @@ PODS:
     - React-jsi (= 0.69.8)
     - React-logger (= 0.69.8)
     - React-perflogger (= 0.69.8)
+  - RNCAsyncStorage (1.17.11):
+    - React-Core
+  - RNFS (2.20.0):
+    - React-Core
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -402,6 +408,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-background-downloader (from `../node_modules/@kesha-antonov/react-native-background-downloader`)"
+  - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -414,6 +421,8 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - RNFS (from `../node_modules/react-native-fs`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -475,6 +484,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-background-downloader:
     :path: "../node_modules/@kesha-antonov/react-native-background-downloader"
+  react-native-slider:
+    :path: "../node_modules/@react-native-community/slider"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -499,6 +510,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -536,6 +551,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 0eda09e9cf22bbb5dbb1d23143b03a31acf37d67
   React-logger: 5997ab008583826c10ffe4e1ff990363e975639d
   react-native-background-downloader: 66c76bdc7fa5c5d315c945a86d98cc398ba4280a
+  react-native-slider: 33b8d190b59d4f67a541061bb91775d53d617d9d
   React-perflogger: ad1416a715d86b32f456e5d0aed99c3b52f1de37
   React-RCTActionSheet: cbf7c6a953982562418ee72a1084ff7b9447b558
   React-RCTAnimation: 33df3e25824dd7313edec28dded2745542f9352b
@@ -548,6 +564,8 @@ SPEC CHECKSUMS:
   React-RCTVibration: 5462287ee85304ba1a00474665ab292e63a41663
   React-runtimeexecutor: 9df680f18497367bcf5c15b6b6406c0f2dfa2b6a
   ReactCommon: c10f046f3ef8561e7c8e7e9b9dae2ecc9ffc48ef
+  RNCAsyncStorage: 8616bd5a58af409453ea4e1b246521bb76578d60
+  RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: d3820731e0ca3a4933f061ad29defaf7726e3251
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
