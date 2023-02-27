@@ -1,33 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
-  SafeAreaView,
   View,
   Text,
   FlatList,
   Button,
+  SafeAreaView,
+  Platform,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import RNBGD from '@kesha-antonov/react-native-background-downloader';
 import Slider from '@react-native-community/slider';
+import {toast, uuid} from '../utils';
 
-const uniqueId = () => Math.random().toString(36).substring(2, 6);
+const defaultDir = RNBGD.directories.documents;
 
-const defaultList = [
-  {
-    id: uniqueId(),
-    url: 'http://212.183.159.230/200MB.zip',
-  },
-  // {
-  //   id: uniqueId(),
-  //   url: 'https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_1920_18MG.mp4',
-  // },
-  // {
-  //   id: uniqueId(),
-  //   url: 'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_5MG.mp3',
-  // },
-];
-
-const Header = ({onStart, onStop, onReset, isStart, ...props}) => {
+const Footer = ({
+  onStart,
+  onStop,
+  onReset,
+  onClear,
+  onRead,
+  isStart,
+  ...props
+}) => {
   return (
     <View style={styles.headerWrapper}>
       {isStart ? (
@@ -37,20 +33,68 @@ const Header = ({onStart, onStop, onReset, isStart, ...props}) => {
       )}
 
       <Button title={'Reset'} onPress={onReset} />
+      <Button title={'Clear'} onPress={onClear} />
+      <Button title={'Read'} onPress={onRead} />
     </View>
   );
 };
 
-const App = () => {
-  const [urlList] = useState(defaultList);
+const BasicExampleScreen = () => {
+  const [urlList] = useState([
+    {
+      id: uuid(),
+      url: 'https://proof.ovh.net/files/100Mb.dat',
+    },
+    {
+      id: uuid(),
+      url: 'https://sabnzbd.org/tests/internetspeed/20MB.bin',
+    },
+    {
+      id: uuid(),
+      url: 'https://sabnzbd.org/tests/internetspeed/50MB.bin',
+    },
+  ]);
 
   const [isStart, setIsStart] = useState(false);
 
   const [downloadTasks, setDownloadTasks] = useState([]);
 
   useEffect(() => {
-    console.log(downloadTasks);
-  }, [downloadTasks]);
+    resumeExistingTasks();
+  }, []);
+
+  /**
+   * It is used to resume your incomplete or unfinished downloads.
+   */
+  const resumeExistingTasks = async () => {
+    const tasks = await RNBGD.checkForExistingDownloads();
+    console.log(tasks);
+
+    if (tasks.length > 0) {
+      tasks.map(task => process(task));
+      setDownloadTasks(prevState => [...prevState, ...tasks]);
+      setIsStart(true);
+    }
+  };
+
+  const readStorage = async () => {
+    const files = await RNFS.readdir(defaultDir);
+    toast('Check logs');
+    console.log(`Downloaded files: ${files}`);
+  };
+
+  const clearStorage = async () => {
+    const files = await RNFS.readdir(defaultDir);
+
+    if (files.length > 0) {
+      await Promise.all(
+        files.map(file => RNFS.unlink(defaultDir + '/' + file)),
+      );
+    }
+
+    toast('Check logs');
+    console.log(`Deleted file count: ${files.length}`);
+  };
 
   const process = task => {
     const {index} = getTask(task.id);
@@ -58,15 +102,12 @@ const App = () => {
     return task
       .begin(({expectedBytes, headers}) => {
         setDownloadTasks(prevState => {
-          task.state = 'DOWNLOADING';
-          task.totalBytes = expectedBytes;
           prevState[index] = task;
           return [...prevState];
         });
       })
       .progress((percent, bytesWritten, totalBytes) => {
         setDownloadTasks(prevState => {
-          task.bytesWritten = bytesWritten;
           prevState[index] = task;
           return [...prevState];
         });
@@ -74,18 +115,20 @@ const App = () => {
       .done(() => {
         console.log(`Finished downloading: ${task.id}`);
         setDownloadTasks(prevState => {
-          task.state = 'DONE';
           prevState[index] = task;
           return [...prevState];
         });
+
+        Platform.OS === 'ios' && RNBGD.completeHandler(task.id);
       })
       .error(err => {
         console.error(`Download ${task.id} has an error: ${err}`);
         setDownloadTasks(prevState => {
-          task.state = 'FAILED';
           prevState[index] = task;
           return [...prevState];
         });
+
+        Platform.OS === 'ios' && RNBGD.completeHandler(task.id)
       });
   };
 
@@ -96,8 +139,13 @@ const App = () => {
   };
 
   const start = () => {
-    const taskData = urlList.map(item => {
-      const destination = RNBGD.directories.documents + '/' + item.id;
+    /**
+     * You need to provide the extension of the file in the destination section below.
+     * If you cannot provide this, you may experience problems while using your file.
+     * For example; Path + File Name + .png
+     */
+    const taskAttributes = urlList.map(item => {
+      const destination = defaultDir + '/' + item.id;
       return {
         id: item.id,
         url: item.url,
@@ -105,20 +153,21 @@ const App = () => {
       };
     });
 
-    const tasks = taskData.map(task => process(RNBGD.download(task)));
+    const tasks = taskAttributes.map(taskAttribute =>
+      process(RNBGD.download(taskAttribute)),
+    );
 
-    setDownloadTasks(tasks);
+    setDownloadTasks(prevState => [...prevState, ...tasks]);
     setIsStart(true);
   };
 
   const stop = () => {
     const tasks = downloadTasks.map((task, index) => {
       task.stop();
-      task.state = 'STOPPED';
       return task;
     });
 
-    setDownloadTasks([...tasks]);
+    setDownloadTasks(tasks);
     setIsStart(false);
   };
 
@@ -126,7 +175,6 @@ const App = () => {
     const {index, task} = getTask(id);
 
     task.pause();
-    task.state = 'PAUSED';
     setDownloadTasks(prevState => {
       prevState[index] = task;
       return [...prevState];
@@ -137,7 +185,6 @@ const App = () => {
     const {index, task} = getTask(id);
 
     task.resume();
-    task.state = 'DOWNLOADING';
     setDownloadTasks(prevState => {
       prevState[index] = task;
       return [...prevState];
@@ -148,7 +195,6 @@ const App = () => {
     const {index, task} = getTask(id);
 
     task.stop();
-    task.state = 'STOPPED';
     setDownloadTasks(prevState => {
       prevState[index] = task;
       return [...prevState];
@@ -162,23 +208,34 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeWrapper}>
-      <Text style={styles.title}>React Native Background Downloader</Text>
-      <FlatList
-        style={styles.scrollWrapper}
-        data={urlList}
-        renderItem={({index, item}) => (
-          <View style={styles.item}>
-            <View style={styles.itemContent}>
-              <Text>Id: {item.id}</Text>
-              <Text>Url: {item.url}</Text>
+    <SafeAreaView style={styles.wrapper}>
+      <Text style={styles.title}>Basic Example</Text>
+      <View>
+        <FlatList
+          data={urlList}
+          keyExtractor={(item, index) => `url-${index}`}
+          renderItem={({index, item}) => (
+            <View style={styles.item}>
+              <View style={styles.itemContent}>
+                <Text>Id: {item.id}</Text>
+                <Text>Url: {item.url}</Text>
+              </View>
             </View>
-          </View>
-        )}
-        keyExtractor={(item, index) => `url-${index}`}
-      />
+          )}
+          ListFooterComponent={() => (
+            <Footer
+              isStart={isStart}
+              onStart={start}
+              onStop={stop}
+              onReset={reset}
+              onClear={clearStorage}
+              onRead={readStorage}
+            />
+          )}
+        />
+      </View>
       <FlatList
-        style={styles.scrollWrapper}
+        style={{flex: 1}}
         data={downloadTasks}
         renderItem={({item, index}) => {
           const isEnd = ['STOPPED', 'DONE', 'FAILED'].includes(item.state);
@@ -190,6 +247,7 @@ const App = () => {
                 <Text>{item?.id}</Text>
                 <Text>{item?.state}</Text>
                 <Slider
+                  disabled={true}
                   value={item?.bytesWritten}
                   minimumValue={0}
                   maximumValue={item?.totalBytes}
@@ -208,21 +266,13 @@ const App = () => {
           );
         }}
         keyExtractor={(item, index) => `task-${index}`}
-        ListHeaderComponent={() => (
-          <Header
-            isStart={isStart}
-            onStart={start}
-            onStop={stop}
-            onReset={reset}
-          />
-        )}
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeWrapper: {
+  wrapper: {
     flex: 1,
   },
   headerWrapper: {
@@ -232,14 +282,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     padding: 6,
   },
-  scrollWrapper: {
-    flex: 1,
-  },
   title: {
     fontSize: 24,
     fontWeight: '500',
     textAlign: 'center',
     alignSelf: 'center',
+    marginTop: 16,
   },
   item: {
     padding: 8,
@@ -253,4 +301,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default BasicExampleScreen;
