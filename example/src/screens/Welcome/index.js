@@ -1,29 +1,34 @@
 import React from 'react';
-import {SafeAreaView, Button, Text, StyleSheet} from 'react-native';
+import {Text, StyleSheet} from 'react-native';
+import {ExButton, ExWrapper} from '../../components/commons';
 
 const WelcomeScreen = ({navigation}) => {
   return (
-    <SafeAreaView style={styles.wrapper}>
+    <ExWrapper>
       <Text style={styles.title}>React Native Background Downloader</Text>
 
-      <Button
+      <ExButton
         title={'1- Basic Example'}
         onPress={() => navigation.navigate('root.basic_example')}
       />
-    </SafeAreaView>
+    </ExWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
   title: {
     fontSize: 24,
     fontWeight: '500',
     textAlign: 'center',
     alignSelf: 'center',
-    marginTop: 16,
+    marginTop: 12,
+  },
+  description: {
+    fontSize: 18,
+    fontWeight: '500',
+    textAlign: 'center',
+    alignSelf: 'center',
+    marginTop: 6,
   },
 });
 

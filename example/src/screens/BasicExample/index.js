@@ -1,17 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  FlatList,
-  Button,
-  SafeAreaView,
-  Platform,
-} from 'react-native';
+import {StyleSheet, View, Text, FlatList, Platform} from 'react-native';
 import RNFS from 'react-native-fs';
 import RNBGD from '@kesha-antonov/react-native-background-downloader';
 import Slider from '@react-native-community/slider';
-import {toast, uuid} from '../utils';
+import {ExButton, ExWrapper} from '../../components/commons';
+import {toast, uuid} from '../../utils';
 
 const defaultDir = RNBGD.directories.documents;
 
@@ -25,16 +18,16 @@ const Footer = ({
   ...props
 }) => {
   return (
-    <View style={styles.headerWrapper}>
+    <View style={styles.headerWrapper} {...props}>
       {isStart ? (
-        <Button title={'Stop'} onPress={onStop} />
+        <ExButton title={'Stop'} onPress={onStop} />
       ) : (
-        <Button title={'Start'} onPress={onStart} />
+        <ExButton title={'Start'} onPress={onStart} />
       )}
 
-      <Button title={'Reset'} onPress={onReset} />
-      <Button title={'Clear'} onPress={onClear} />
-      <Button title={'Read'} onPress={onRead} />
+      <ExButton title={'Reset'} onPress={onReset} />
+      <ExButton title={'Clear'} onPress={onClear} />
+      <ExButton title={'Read'} onPress={onRead} />
     </View>
   );
 };
@@ -67,7 +60,12 @@ const BasicExampleScreen = () => {
    * It is used to resume your incomplete or unfinished downloads.
    */
   const resumeExistingTasks = async () => {
-    const tasks = await RNBGD.checkForExistingDownloads();
+    const tasks = await RNBGD.checkForExistingDownloads()
+      .then(data => data)
+      .catch(err => {
+        console.log(`checkForExistingDownloads failed ${err}`);
+      });
+
     console.log(tasks);
 
     if (tasks.length > 0) {
@@ -128,7 +126,7 @@ const BasicExampleScreen = () => {
           return [...prevState];
         });
 
-        Platform.OS === 'ios' && RNBGD.completeHandler(task.id)
+        Platform.OS === 'ios' && RNBGD.completeHandler(task.id);
       });
   };
 
@@ -162,7 +160,7 @@ const BasicExampleScreen = () => {
   };
 
   const stop = () => {
-    const tasks = downloadTasks.map((task, index) => {
+    const tasks = downloadTasks.map(task => {
       task.stop();
       return task;
     });
@@ -208,7 +206,7 @@ const BasicExampleScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.wrapper}>
+    <ExWrapper>
       <Text style={styles.title}>Basic Example</Text>
       <View>
         <FlatList
@@ -235,7 +233,7 @@ const BasicExampleScreen = () => {
         />
       </View>
       <FlatList
-        style={{flex: 1}}
+        style={{flex: 1, flexGrow: 1}}
         data={downloadTasks}
         renderItem={({item, index}) => {
           const isEnd = ['STOPPED', 'DONE', 'FAILED'].includes(item.state);
@@ -256,25 +254,25 @@ const BasicExampleScreen = () => {
               <View>
                 {!isEnd &&
                   (isDownloading ? (
-                    <Button title={'Pause'} onPress={() => pause(item.id)} />
+                    <ExButton title={'Pause'} onPress={() => pause(item.id)} />
                   ) : (
-                    <Button title={'Resume'} onPress={() => resume(item.id)} />
+                    <ExButton
+                      title={'Resume'}
+                      onPress={() => resume(item.id)}
+                    />
                   ))}
-                <Button title={'Cancel'} onPress={() => cancel(item.id)} />
+                <ExButton title={'Cancel'} onPress={() => cancel(item.id)} />
               </View>
             </View>
           );
         }}
         keyExtractor={(item, index) => `task-${index}`}
       />
-    </SafeAreaView>
+    </ExWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
   headerWrapper: {
     flex: 1,
     flexDirection: 'row',
