@@ -308,12 +308,12 @@ RCT_EXPORT_METHOD(completeHandler:(nonnull NSString *)jobId
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     NSLog(@"[RNBackgroundDownloader] - [completeHandlerIOS]");
-    if (storedCompletionHandler) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if (storedCompletionHandler) {
             storedCompletionHandler();
             storedCompletionHandler = nil;
-        }];
-    }
+        }
+    }];
     resolve(nil);
 }
 
