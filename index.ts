@@ -1,4 +1,4 @@
-import { NativeModules, NativeEventEmitter } from 'react-native'
+import { NativeModules, NativeEventEmitter, Platform } from 'react-native'
 import DownloadTask from './lib/DownloadTask'
 
 const { RNBackgroundDownloader } = NativeModules
@@ -38,6 +38,11 @@ export function setHeaders (h = {}) {
     throw new Error('[RNBackgroundDownloader] headers must be an object')
 
   headers = h
+}
+
+export function initDownloader (options = {}) {
+  if (Platform.OS === 'android')
+    RNBackgroundDownloader.initDownloader(options)
 }
 
 export function checkForExistingDownloads () {

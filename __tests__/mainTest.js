@@ -1,4 +1,4 @@
-import RNBackgroundDownloader from '../index'
+import RNBackgroundDownloader, { initDownloader } from '../index'
 import DownloadTask from '../lib/downloadTask'
 import { NativeModules, NativeEventEmitter } from 'react-native'
 
@@ -127,6 +127,14 @@ test('stop', () => {
   stopDT.stop()
   expect(stopDT.state).toBe('STOPPED')
   expect(RNBackgroundDownloaderNative.stopTask).toHaveBeenCalled()
+})
+
+test('initDownloader', () => {
+  return RNBackgroundDownloader.initDownloader()
+    .then(res => {
+      expect(RNBackgroundDownloaderNative.initDownloader).toHaveBeenCalled()
+      expect(res).toBe(undefined)
+    })
 })
 
 test('checkForExistingDownloads', () => {

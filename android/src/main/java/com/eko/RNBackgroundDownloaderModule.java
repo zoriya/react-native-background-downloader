@@ -84,22 +84,10 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
   private HashMap<String, WritableMap> progressReports = new HashMap<>();
   private static Object sharedLock = new Object();
 
-  public RNBackgroundDownloaderModule(ReactApplicationContext reactContext) {
+  public RNBackgroundDownloaderModule(ReactApplicationContext reactContext, ReadableMap options) {
     super(reactContext);
 
-    OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
-    final Downloader okHttpDownloader = new OkHttpDownloader(okHttpClient,
-                Downloader.FileDownloaderType.PARALLEL);
-
-    loadConfigMap();
-    FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this.getReactApplicationContext())
-            .setDownloadConcurrentLimit(4)
-            .setHttpDownloader(okHttpDownloader)
-            .enableRetryOnNetworkGain(true)
-            .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
-            .build();
-    fetch = Fetch.Impl.getInstance(fetchConfiguration);
-    fetch.addListener(this);
+    this.initDownloader();
   }
 
   @Override
@@ -153,6 +141,32 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     constants.put("OnlyWifi", NetworkType.WIFI_ONLY.getValue());
     constants.put("AllNetworks", NetworkType.ALL.getValue());
     return  constants;
+  }
+
+  @ReactMethod
+  public void initDownloader(ReadableMap options) {
+    if (fetch) {
+      fetch.close();
+      fetch = null;
+    }
+
+    Downloader downloader = options.getString("androidDownloaderType") == "parallel"
+      ? Downloader.FileDownloaderType.PARALLEL
+      : Downloader.FileDownloaderType.SEQUENTIAL;
+
+    OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+    final Downloader okHttpDownloader = new OkHttpDownloader(okHttpClient,
+                downloader);
+
+    loadConfigMap();
+    FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this.getReactApplicationContext())
+            .setDownloadConcurrentLimit(4)
+            .setHttpDownloader(okHttpDownloader)
+            .enableRetryOnNetworkGain(true)
+            .setHttpDownloader(new HttpUrlConnectionDownloader(downloader))
+            .build();
+    fetch = Fetch.Impl.getInstance(fetchConfiguration);
+    fetch.addListener(this);
   }
 
   private void removeFromMaps(int requestId) {

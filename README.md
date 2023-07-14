@@ -321,6 +321,18 @@ Resumes a pause download
 ### `stop()`
 Stops the download for good and removes the file that was written so far
 
+### `initDownloader(options)`
+
+Init android downloader with options
+
+**options**
+
+An object containing options properties
+
+| Property      | Type                                             | Required | Platforms | Info                                                                                                                                                                             |
+| ------------- | ------------------------------------------------ | :------: | :-------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`        | String                                           |          | Android    | Downloader type: 'parallel' or 'sequential'. Default: 'sequential'. 'parallel' seems to cause lots of ANRs, so be careful |
+
 ## Constants
 
 ### directories

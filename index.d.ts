@@ -76,6 +76,11 @@ export interface DownloadTask {
 export type CheckForExistingDownloads = () => Promise<DownloadTask[]>;
 export type EnsureDownloadsAreRunning = () => Promise<void>;
 
+export interface InitDownloaderOptions {
+  type?: 'parallel' | 'sequential' | null;
+}
+export type InitDownloader = (options: InitDownloaderOptions) => Promise<void>;
+
 export interface DownloadOption {
   id: string;
   url: string;
@@ -104,6 +109,7 @@ export interface Priority {
 export const setHeaders: SetHeaders;
 export const checkForExistingDownloads: CheckForExistingDownloads;
 export const ensureDownloadsAreRunning: EnsureDownloadsAreRunning;
+export const initDownloader: InitDownloader;
 export const download: Download;
 export const completeHandler: CompleteHandler;
 export const directories: Directories;
@@ -112,6 +118,7 @@ export const Priority: Priority;
 
 export interface RNBackgroundDownloader {
   setHeaders: SetHeaders;
+  initDownloader: InitDownloader;
   checkForExistingDownloads: CheckForExistingDownloads;
   ensureDownloadsAreRunning: EnsureDownloadsAreRunning;
   download: Download;
