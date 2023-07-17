@@ -1,4 +1,4 @@
-import RNBackgroundDownloader, { initDownloader } from '../index'
+import RNBackgroundDownloader from '../index'
 import DownloadTask from '../lib/downloadTask'
 import { NativeModules, NativeEventEmitter } from 'react-native'
 
@@ -130,11 +130,17 @@ test('stop', () => {
 })
 
 test('initDownloader', () => {
-  return RNBackgroundDownloader.initDownloader()
-    .then(res => {
-      expect(RNBackgroundDownloaderNative.initDownloader).toHaveBeenCalled()
-      expect(res).toBe(undefined)
-    })
+  jest.mock('react-native/Libraries/Utilities/Platform', () => {
+    const Platform = jest.requireActual(
+      'react-native/Libraries/Utilities/Platform'
+    )
+    Platform.OS = 'android'
+    return Platform
+  })
+
+  const res = RNBackgroundDownloader.initDownloader()
+  expect(RNBackgroundDownloaderNative.initDownloader).toHaveBeenCalled()
+  expect(res).toBe(undefined)
 })
 
 test('checkForExistingDownloads', () => {

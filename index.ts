@@ -134,6 +134,7 @@ export const Priority = {
 }
 
 export default {
+  initDownloader,
   download,
   checkForExistingDownloads,
   ensureDownloadsAreRunning,

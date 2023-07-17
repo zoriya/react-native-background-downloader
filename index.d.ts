@@ -79,7 +79,7 @@ export type EnsureDownloadsAreRunning = () => Promise<void>;
 export interface InitDownloaderOptions {
   type?: 'parallel' | 'sequential' | null;
 }
-export type InitDownloader = (options: InitDownloaderOptions) => Promise<void>;
+export type InitDownloader = (options: InitDownloaderOptions) => undefined;
 
 export interface DownloadOption {
   id: string;
