@@ -67,14 +67,14 @@ For anything **`< 0.60`** run the following link command
   - Add `import com.eko.RNBackgroundDownloaderPackage;` to the imports at the top of the file
   - Add `new RNBackgroundDownloaderPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
-  	```
-  	include ':react-native-background-downloader'
-  	project(':react-native-background-downloader').projectDir = new File(rootProject.projectDir, 	'../node_modules/@kesha-antonov/react-native-background-downloader/android')
-  	```
+    ```
+    include ':react-native-background-downloader'
+    project(':react-native-background-downloader').projectDir = new File(rootProject.projectDir,   '../node_modules/@kesha-antonov/react-native-background-downloader/android')
+    ```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
+    ```
       compile project(':react-native-background-downloader')
-  	```
+    ```
 </details>
 
 ### iOS - Extra Mandatory Step
@@ -105,16 +105,16 @@ import { download, completeHandler } from '@kesha-antonov/react-native-backgroun
 const jobId = 'file123'
 
 let task = download({
-	id: jobId,
-	url: 'https://link-to-very.large/file.zip',
-	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
-	metadata: {}
+  id: jobId,
+  url: 'https://link-to-very.large/file.zip',
+  destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
+  metadata: {}
 }).begin(({ expectedBytes, headers }) => {
-	console.log(`Going to download ${expectedBytes} bytes!`)
+  console.log(`Going to download ${expectedBytes} bytes!`)
 }).progress(percent => {
-	console.log(`Downloaded: ${percent * 100}%`)
+  console.log(`Downloaded: ${percent * 100}%`)
 }).done(() => {
-	console.log('Download is done!')
+  console.log('Download is done!')
 
   // PROCESS YOUR STUFF
 
@@ -122,7 +122,7 @@ let task = download({
   if (Platform.OS === 'ios')
     completeHandler(jobId)
 }).error(error => {
-	console.log('Download canceled due to error: ', error);
+  console.log('Download canceled due to error: ', error);
 })
 
 // Pause the task
@@ -148,14 +148,14 @@ import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downl
 
 let lostTasks = await RNBackgroundDownloader.checkForExistingDownloads()
 for (let task of lostTasks) {
-	console.log(`Task ${task.id} was found!`)
-	task.progress(percent => {
-		console.log(`Downloaded: ${percent * 100}%`)
-	}).done(() => {
-		console.log('Download is done!')
-	}).error(error => {
-		console.log('Download canceled due to error: ', error)
-	})
+  console.log(`Task ${task.id} was found!`)
+  task.progress(percent => {
+    console.log(`Downloaded: ${percent * 100}%`)
+  }).done(() => {
+    console.log('Download is done!')
+  }).error(error => {
+    console.log('Download canceled due to error: ', error)
+  })
 }
 ```
 
@@ -175,20 +175,20 @@ This way, all downloads with have the given headers.
 2) Per download by passing a headers object in the options of `RNBackgroundDownloader.download()`:
 ```javascript
 let task = RNBackgroundDownloader.download({
-	id: 'file123',
-	url: 'https://link-to-very.large/file.zip'
-	destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
-	headers: {
-	    Authorization: 'Bearer 2we$@$@Ddd223'
-	}
+  id: 'file123',
+  url: 'https://link-to-very.large/file.zip'
+  destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
+  headers: {
+      Authorization: 'Bearer 2we$@$@Ddd223'
+  }
 }).begin(({ expectedBytes, headers }) => {
-	console.log(`Going to download ${expectedBytes} bytes!`)
+  console.log(`Going to download ${expectedBytes} bytes!`)
 }).progress(percent => {
-	console.log(`Downloaded: ${percent * 100}%`)
+  console.log(`Downloaded: ${percent * 100}%`)
 }).done(() => {
-	console.log('Download is done!')
+  console.log('Download is done!')
 }).error(error => {
-	console.log('Download canceled due to error: ', error)
+  console.log('Download canceled due to error: ', error)
 })
 ```
 Headers given in the `download` function are **merged** with the ones given in `setHeaders`.
@@ -266,7 +266,7 @@ Either stop all tasks:
 ```javascript
 const tasks = await checkForExistingDownloads()
 for (const task of tasks)
-	task.stop()
+  task.stop()
 ```
 
 Or re-attach them:
@@ -274,11 +274,11 @@ Or re-attach them:
 ```javascript
 const tasks = await checkForExistingDownloads()
 for (const task of tasks) {
-	task.pause()
-	//
-	// YOUR LOGIC OF RE-ATTACHING DOWLOADS TO YOUR STUFF
-	// ...
-	//
+  task.pause()
+  //
+  // YOUR LOGIC OF RE-ATTACHING DOWLOADS TO YOUR STUFF
+  // ...
+  //
 }
 ```
 
@@ -289,10 +289,10 @@ for (const task of tasks) {
 ```javascript
 
 function handleAppStateChange (appState) {
-	if (appState !== 'active')
-		return
+  if (appState !== 'active')
+    return
 
-	ensureDownloadsAreRunning()
+  ensureDownloadsAreRunning()
 }
 
 const appStateChangeListener = AppState.addEventListener('change', handleAppStateChange)

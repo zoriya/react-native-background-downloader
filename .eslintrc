@@ -318,7 +318,7 @@
 
         // https://eslint.org/docs/rules/key-spacing
         "key-spacing": [
-            "warn", 
+            "warn",
             {
                 "singleLine": {
                     "beforeColon": false,
