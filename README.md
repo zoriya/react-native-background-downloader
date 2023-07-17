@@ -333,6 +333,19 @@ An object containing options properties
 | ------------- | ------------------------------------------------ | :------: | :-------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type`        | String                                           |          | Android    | Downloader type: 'parallel' or 'sequential'. Default: 'sequential'. 'parallel' seems to cause lots of ANRs, so be careful |
 
+**Usage**
+
+```javascript
+import { initDownloader } from '@kesha-antonov/react-native-background-downloader'
+
+...
+// SOMEWHERE AT APP STARTUP
+
+useEffect(() => {
+	initDownloader({ type: 'parallel' })
+}, [])
+```
+
 ## Constants
 
 ### directories

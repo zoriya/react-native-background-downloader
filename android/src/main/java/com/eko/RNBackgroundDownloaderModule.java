@@ -8,6 +8,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableArray;
@@ -84,10 +85,11 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
   private HashMap<String, WritableMap> progressReports = new HashMap<>();
   private static Object sharedLock = new Object();
 
-  public RNBackgroundDownloaderModule(ReactApplicationContext reactContext, ReadableMap options) {
+  public RNBackgroundDownloaderModule(ReactApplicationContext reactContext) {
     super(reactContext);
 
-    this.initDownloader();
+    ReadableMap emptyMap = Arguments.createMap();
+    this.initDownloader(emptyMap);
   }
 
   @Override
@@ -140,30 +142,30 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     constants.put("PriorityLow", Priority.LOW.getValue());
     constants.put("OnlyWifi", NetworkType.WIFI_ONLY.getValue());
     constants.put("AllNetworks", NetworkType.ALL.getValue());
-    return  constants;
+    return constants;
   }
 
   @ReactMethod
   public void initDownloader(ReadableMap options) {
-    if (fetch) {
+    if (fetch != null) {
       fetch.close();
       fetch = null;
     }
 
-    Downloader downloader = options.getString("androidDownloaderType") == "parallel"
+    Downloader.FileDownloaderType downloaderType = options.getString("type") == "parallel"
       ? Downloader.FileDownloaderType.PARALLEL
       : Downloader.FileDownloaderType.SEQUENTIAL;
 
     OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
     final Downloader okHttpDownloader = new OkHttpDownloader(okHttpClient,
-                downloader);
+                downloaderType);
 
     loadConfigMap();
     FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this.getReactApplicationContext())
             .setDownloadConcurrentLimit(4)
             .setHttpDownloader(okHttpDownloader)
             .enableRetryOnNetworkGain(true)
-            .setHttpDownloader(new HttpUrlConnectionDownloader(downloader))
+            .setHttpDownloader(new HttpUrlConnectionDownloader(downloaderType))
             .build();
     fetch = Fetch.Impl.getInstance(fetchConfiguration);
     fetch.addListener(this);
