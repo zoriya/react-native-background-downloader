@@ -167,7 +167,7 @@ If you need to send custom headers with your download request, you can do in it 
 1) Globally using `RNBackgroundDownloader.setHeaders()`:
 ```javascript
 RNBackgroundDownloader.setHeaders({
-    Authorization: 'Bearer 2we$@$@Ddd223'
+  Authorization: 'Bearer 2we$@$@Ddd223'
 })
 ```
 This way, all downloads with have the given headers.
