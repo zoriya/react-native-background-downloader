@@ -179,7 +179,7 @@ let task = RNBackgroundDownloader.download({
   url: 'https://link-to-very.large/file.zip'
   destination: `${RNBackgroundDownloader.directories.documents}/file.zip`,
   headers: {
-      Authorization: 'Bearer 2we$@$@Ddd223'
+    Authorization: 'Bearer 2we$@$@Ddd223'
   }
 }).begin(({ expectedBytes, headers }) => {
   console.log(`Going to download ${expectedBytes} bytes!`)
