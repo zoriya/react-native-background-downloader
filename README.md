@@ -342,7 +342,7 @@ import { initDownloader } from '@kesha-antonov/react-native-background-downloade
 // SOMEWHERE AT APP STARTUP
 
 useEffect(() => {
-	initDownloader({ type: 'parallel' })
+  initDownloader({ type: 'parallel' })
 }, [])
 ```
 
