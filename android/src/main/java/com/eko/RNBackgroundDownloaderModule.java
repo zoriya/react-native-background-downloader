@@ -405,12 +405,16 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
               e.printStackTrace();
             }
         });
-        try {
-          th.start();
-          th.join();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+          public void run() {
+            try {
+              th.start();
+              th.join();
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
+        }).start();
       } else {
         params.putInt("written", (int)download.getDownloaded());
         params.putInt("total", (int)download.getTotal());
