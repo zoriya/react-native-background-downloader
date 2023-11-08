@@ -7,7 +7,10 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    namespace "com.eko"
+     if (project.android.hasProperty("namespace")) {
+        namespace "com.eko"
+    }
+
     compileSdkVersion safeExtGet('compileSdkVersion', 34)
 
     defaultConfig {
