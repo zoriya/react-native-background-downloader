@@ -86,6 +86,7 @@ export interface DownloadOption {
   url: string;
   destination: string;
   headers?: DownloadHeaders | undefined;
+  metadata?: object;
 }
 
 export type Download = (options: DownloadOption) => DownloadTask;
